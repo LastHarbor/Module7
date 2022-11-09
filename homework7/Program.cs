@@ -1,40 +1,36 @@
-﻿using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
-using HomeWork7;
+﻿namespace HomeWork7;
 
-namespace HomeWork7;
+internal class Programm
+{
 
-    internal class Programm
+    static void Main()
     {
-        
-        static void Main()
+        string path = "DB.csv";
+        Repository rep = new Repository(path);
+        rep.IsFileExist();
+        char y = 'y';
+        char n = 'n';
+        bool flag = true;
+        while (flag)
         {
-            string path = "DB.csv";
-            Repository rep = new Repository(path);
-            rep.IsFileExist();
-            Console.WriteLine("Нажмите 1 - для записи");
-            Console.WriteLine("Нажмите 2 - для удаления");
-            Console.WriteLine("Нажмите 3 - для просмотра списка сотрудников");
-            Console.WriteLine("Нажмите 4 - для создания списка тестовых сотрудников");
-            Console.WriteLine("Нажмите 5 - для вывода сотрудника по ID");
-            Console.WriteLine("Нажмите 6 - для удаления сотрудника по ID");
-            Console.WriteLine("Нажмите s - для сохранения или для выхода из программы");
-            char y = 'y';
-            char n = 'n';
+            Console.WriteLine("Нажмите 1 - Запись 1 сотрудника");
+            Console.WriteLine("Нажмите 2 - Пересоздать файл");
+            Console.WriteLine("Нажмите 3 - Просмотр списка сотрудников");
+            Console.WriteLine("Нажмите 4 - Создание списка тестовых сотрудников");
+            Console.WriteLine("Нажмите 5 - Вывод сотрудника по ID");
+            Console.WriteLine("Нажмите 6 - Удаление сотрудника по ID");
+            Console.WriteLine("Нажмите 7 - Вывод сотрудников в диапозоне дат");
+            Console.WriteLine("Нажмите s - Сохранить или выйти");
             char switcher = Convert.ToChar(Console.ReadLine());
             switch (switcher)
             {
                 case '1':
                     Console.Clear();
-                    rep.CreateWorker();
+                    rep.CreateWorker(new Worker());
                     Console.WriteLine("Продолжить? y,n - вернуться в меню");
                     char select = char.Parse(Console.ReadLine());
-                    if (select == y)
-                    {
-                        rep.CreateWorker();
-                    }
-                    else if (select == n) Main();
+                    if (select == y) rep.CreateWorker(new Worker());
+                    else if (select == n) Console.Clear();
                     break;
                 case '2':
                     File.Delete(path);
@@ -43,7 +39,7 @@ namespace HomeWork7;
                 case '3':
                     rep.GetWorkers();
                     Console.ReadLine();
-                    Main();
+                    Console.Clear();
                     break;
                 case '4':
                     rep.CreateTestWorkers(new Worker());
@@ -51,39 +47,34 @@ namespace HomeWork7;
                     break;
                 case '5':
                     rep.GetWorkerByID();
-                    Console.WriteLine("Продолжить? y - да, n - вернуться в мюне");
+                    Console.WriteLine("Продолжить? y - да, n - в меню");
                     char select2 = char.Parse(Console.ReadLine());
-                    if (select2 == 'y')
-                    {
-                        rep.GetWorkerByID();
-                    }
-                    else if (select2 == n) Main();
-
+                    if (select2 == 'y') rep.GetWorkerByID();
+                    else Console.Clear();
                     break;
                 case '6':
-                    Console.WriteLine("Продолжить? y - да, n - вернуться в мюне");
+                    rep.DeleteById();
+                    Console.WriteLine("Продолжить? y - да, n - в меню");
                     char select3 = char.Parse(Console.ReadLine());
-                    if (select3 == 'y')
-                    {
-                        rep.DeleteById();
-                    }
-                    else if (select3 == n) Main();
+                    if (select3 == 'y') rep.DeleteById();
+                    else Console.Clear();
+                    break;
+                case '7':
+                    rep.GetWorkersBetweenDate();
                     break;
                 case 's':
-                    Console.WriteLine("y - Сохранить и выйти, n - Сохранить и вернуться");
+                    Console.WriteLine("y - Продолжить?, n - Сохранить и выйти");
                     char tmp = char.Parse(Console.ReadLine());
-                    if (tmp == 'y')
+                    if (tmp == 'y') continue;
+                    if (tmp == 'n')
                     {
+                        File.WriteAllText(path, String.Empty);
                         rep.Save();
-
-                    }
-                    else if (tmp == n)
-                    {
-                        rep.Save();
-                        Main();
+                        flag = false;
                     }
                     break;
-
             }
+
         }
     }
+}

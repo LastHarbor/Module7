@@ -130,7 +130,7 @@ namespace HomeWork7
         #region Методы
         public void Print()
         {
-            string temp = String.Format("{0,5} {1,15} {2,10} {3,10} {4,17} {5,25} {6,22}",
+            string temp = String.Format("{0,10} {1,15} {2,15} {3,10} {4,20} {5,25} {6,20}",
                 ID,
                 Date,
                 Name,

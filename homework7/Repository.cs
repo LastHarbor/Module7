@@ -1,20 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Formats.Asn1;
-using System.Globalization;
-using System.IO;
+﻿using System.Text;
 using System.Linq;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading.Tasks.Sources;
-using System.Xml.Linq;
-using Microsoft.VisualBasic;
-
-
-
 
 namespace HomeWork7
 {
@@ -35,10 +20,9 @@ namespace HomeWork7
 
         #region MainMehtods
 
-        public void CreateWorker()
+        public void CreateWorker(Worker w)
         {
-            var w = new Worker();
-            w.ID = Count++;
+            w.ID = Count;
             w.Date = DateTime.Now;
             Console.WriteLine("Введите имя сотрудника - ");
             w.Name = Console.ReadLine();
@@ -52,10 +36,7 @@ namespace HomeWork7
             w.Locate = Console.ReadLine();
             AddWorker(w);
         }
-
-        /// <summary>
-        /// Метод получения списка Workers
-        /// </summary>
+        
         public void GetWorkers()
         {
             PrintTitles();
@@ -111,12 +92,35 @@ namespace HomeWork7
             return countOfID;
         }
 
+        public void GetWorkersBetweenDate()
+        {
+            Console.WriteLine("Введите первую дату - ");
+            DateTime dateFrom = DateTime.Parse(Console.ReadLine());
+            Console.WriteLine("Введите вторую дату - ");
+            DateTime dateTo = DateTime.Parse(Console.ReadLine());
+            PrintTitles();
+            for (int i = 0; i < Workers.Length; i++)
+            {
+                if (Workers[i].Birthday < dateTo && Workers[i].Birthday>dateFrom )
+                {
+                    Workers[i].Print();
+                }
+            }
+            
+        }
+
         #endregion
 
         #region Other methods
+
+        public void ClearMemory()
+        {
+            Array.Resize(ref Workers, 0);
+            Array.Resize(ref titles, 0);
+        }
         private void PrintTitles()
         {
-            string tmp = String.Format("{0,5} {1,15} {2,15} {3,15} {4,15} {5,20} {6,35}",
+            string tmp = String.Format("{0,10} {1,15} {2,19} {3,15} {4,15} {5,20} {6,25}",
                 this.titles[0],
                 this.titles[1],
                 this.titles[2],
@@ -131,9 +135,18 @@ namespace HomeWork7
         {
             using (var sw = new StreamWriter(path, true, Encoding.Unicode))
             {
+                string tmp = String.Format("{0,10}, {1,15}, {2,19}, {3,15}, {4,15}, {5,20}, {6,25}",
+                    this.titles[0],
+                    this.titles[1],
+                    this.titles[2],
+                    this.titles[3],
+                    this.titles[4],
+                    this.titles[5],
+                    this.titles[6]);
+                sw.WriteLine(tmp);
                 for (int i = 0; i < index; i++)
                 {
-                    string temp2 = String.Format("{0,5} {1,15} {2,10} {3,10} {4,17} {5,25} {6,22}",
+                    string temp2 = String.Format("{0,10}# {1,15}# {2,15}# {3,10}# {4,20}# {5,25}# {6,20}#",
                         this.Workers[i].ID,
                         this.Workers[i].Date,
                         this.Workers[i].Name,
@@ -145,20 +158,38 @@ namespace HomeWork7
                 }
             }
         }
-
-
+        
         public void IsFileExist()
         {
+            FileInfo fi = new FileInfo(path);
             // При проверке на существование файла инициализировать массив заголовков, а так же инициализировать массив Работкников, далее записывать в него новых Workers, а после рабоыт с этими массивами, сохранять в форматированном виде.
             //Метод loadDB удалить.
             if (!File.Exists(this.path))
             {
-                File.AppendAllText(path, String.Empty);
+                File.AppendAllText(path, string.Empty);
+                string text = "ID, Дата создания, Имя, Возраст, Рост, Дата рождения, Место рождения";
+                string[] text2 = text.Split(',');
+                Array.Copy(text2, titles, titles.Length);
             }
-            string text = "ID, Дата создания, ФИО, Возраст, Рост, Дата рождения, Место рождения\n";
-            string[] text2 = text.Split(',');
-            Array.Copy(text2, titles, titles.Length);
-            AddWorker(new Worker());
+            else
+            {
+                string text = "ID, Дата создания, Имя, Возраст, Рост, Дата рождения, Место рождения";
+                string[] text2 = text.Split(',');
+                Array.Copy(text2, titles, titles.Length);
+            }
+            if (fi.Length > 0)
+            {
+                using (var sr = new StreamReader(path, Encoding.Unicode))
+                {
+                    titles = sr.ReadLine().Split(',');
+                    while (!sr.EndOfStream)
+                    {   
+                        string[] args = sr.ReadLine().Split('#');
+                        AddWorker(new Worker(Convert.ToInt32(args[0]), Convert.ToDateTime(args[1]), args[2], Convert.ToByte(args[3]),
+                            Convert.ToByte(args[4]), Convert.ToDateTime(args[5]), args[6]));
+                    }
+                }
+            }
         }
 
         private void GetMoreSpace(bool flag)
@@ -199,7 +230,7 @@ namespace HomeWork7
 
             for (int i = 0; i < test1; i++)
             {
-                workerTest.ID = i;
+                workerTest.ID = Count;
                 workerTest.Date = DateTime.Now;
                 workerTest.Name = names[new Random().Next(0, names.Length)];
                 workerTest.Age = Convert.ToByte(r.Next(21, 65));
@@ -220,7 +251,6 @@ namespace HomeWork7
             return newDate;
         }
         #endregion
-
     }
 }
 #region Shit
